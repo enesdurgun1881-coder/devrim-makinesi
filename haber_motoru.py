@@ -244,11 +244,12 @@ def caption_yaz(haber_basligi):
     # Tüm modeller başarısız olduysa fallback kullan
     log("⚠️ Tüm modeller başarısız, fallback caption kullanılıyor", "warning")
     fallback_templates = [
-            f"🔴 {haber_basligi}\n\n💪 Halkın iktidarı yakındır! CHP olarak milletimizin yanındayız, yanında olmaya devam edeceğiz!\n\n#CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem #DailyCHP #Siyaset",
-            f"🔴 {haber_basligi}\n\n✊ Mustafa Kemal'in izinde, halkın yanında! Adalet, eşitlik ve özgürlük için mücadelemiz sürecek!\n\n#CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem #DailyCHP #Siyaset",
-            f"🔴 {haber_basligi}\n\n🇹🇷 Altı okumuz rehberimiz, milletimiz gücümüz! CHP olarak her zaman halkın sesi olacağız!\n\n#CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem #DailyCHP #Siyaset"
-        ]
-        return random.choice(fallback_templates)
+        f"🔴 {haber_basligi}\n\n💪 Halkın iktidarı yakındır! CHP olarak milletimizin yanındayız, yanında olmaya devam edeceğiz!\n\n#CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem #DailyCHP #Siyaset",
+        f"🔴 {haber_basligi}\n\n✊ Mustafa Kemal'in izinde, halkın yanında! Adalet, eşitlik ve özgürlük için mücadelemiz sürecek!\n\n#CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem #DailyCHP #Siyaset",
+        f"🔴 {haber_basligi}\n\n🇹🇷 Altı okumuz rehberimiz, milletimiz gücümüz! CHP olarak her zaman halkın sesi olacağız!\n\n#CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem #DailyCHP #Siyaset"
+    ]
+    return random.choice(fallback_templates)
+
 
 def logoyu_bas_ve_kaydet(img_obj, logo_yolu, dosya_adi):
     try:
