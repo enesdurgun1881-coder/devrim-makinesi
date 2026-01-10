@@ -187,7 +187,13 @@ def resim_indir_zorla(haber_linki):
     return None
 
 def caption_yaz(haber_basligi):
-    """AI ile caption oluştur - google-generativeai kütüphanesi ile"""
+    """AI ile caption oluştur - dinamik model keşfi ile"""
+    
+    # API key kontrolü
+    if not API_KEY:
+        log("⚠️ API Key yok, fallback caption kullanılıyor", "warning")
+        return _fallback_caption(haber_basligi)
+    
     prompt = f"""
     Haber: {haber_basligi}
     Rol: 'Daily CHP' fanatik admini.
@@ -197,29 +203,58 @@ def caption_yaz(haber_basligi):
     Hashtagler: #CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem
     """
     
-    # Denenecek modeller
-    models_to_try = [
+    # Önce mevcut modelleri keşfet
+    available_models = []
+    try:
+        log("🔍 Mevcut modeller keşfediliyor...", "info")
+        for m in genai.list_models():
+            if 'generateContent' in str(m.supported_generation_methods):
+                model_name = m.name.replace("models/", "")
+                available_models.append(model_name)
+        log(f"📋 Bulunan modeller: {available_models[:5]}...", "info")
+    except Exception as e:
+        log(f"⚠️ Model listesi alınamadı: {str(e)[:50]}", "warning")
+        # Varsayılan liste kullan
+        available_models = ["gemini-1.5-flash", "gemini-pro", "gemini-1.0-pro"]
+    
+    # Tercih sırasına göre dene
+    preferred_order = [
         "gemini-1.5-flash",
+        "gemini-1.5-pro", 
         "gemini-pro",
-        "gemini-1.0-pro"
+        "gemini-1.0-pro",
+        "gemini-1.0-pro-latest"
     ]
     
-    for model_name in models_to_try:
+    # Mevcut olanları tercih sırasına göre sırala
+    models_to_try = [m for m in preferred_order if m in available_models]
+    # Listede olmayan ama mevcut olanları da ekle
+    models_to_try.extend([m for m in available_models if m not in models_to_try and "gemini" in m.lower()])
+    
+    if not models_to_try:
+        models_to_try = preferred_order  # Son çare: hepsini dene
+    
+    for model_name in models_to_try[:5]:  # Max 5 deneme
         try:
             log(f"📝 Caption deniyor ({model_name})...", "info")
             model = genai.GenerativeModel(model_name)
             response = model.generate_content(prompt)
             
             if response and response.text:
-                caption = response.text
+                caption = response.text.strip()
                 log(f"✅ Caption hazır ({model_name}): {caption[:50]}...", "success")
                 return caption
         except Exception as e:
-            log(f"⚠️ Model hatası ({model_name}): {str(e)[:100]}", "warning")
+            error_msg = str(e)[:100]
+            log(f"⚠️ Model hatası ({model_name}): {error_msg}", "warning")
             continue
     
     # Tüm modeller başarısız olduysa fallback kullan
     log("⚠️ Tüm modeller başarısız, fallback caption kullanılıyor", "warning")
+    return _fallback_caption(haber_basligi)
+
+def _fallback_caption(haber_basligi):
+    """Fallback caption şablonları"""
     fallback_templates = [
         f"🔴 {haber_basligi}\n\n💪 Halkın iktidarı yakındır! CHP olarak milletimizin yanındayız, yanında olmaya devam edeceğiz!\n\n#CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem #DailyCHP #Siyaset",
         f"🔴 {haber_basligi}\n\n✊ Mustafa Kemal'in izinde, halkın yanında! Adalet, eşitlik ve özgürlük için mücadelemiz sürecek!\n\n#CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem #DailyCHP #Siyaset",
