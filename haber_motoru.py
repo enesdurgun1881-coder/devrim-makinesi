@@ -18,7 +18,9 @@ from datetime import datetime
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # --- AYARLAR ---
-API_KEY = os.environ.get("GOOGLE_API_KEY", "AIzaSyAgcsXUyxdt1nJrdmYfgV9rsgxKLBVIp0k")
+API_KEY = os.environ.get("GOOGLE_API_KEY")
+if not API_KEY:
+    print("⚠️ UYARI: GOOGLE_API_KEY bulunamadı! AI özellikleri çalışmayabilir.")
 try:
     genai.configure(api_key=API_KEY)
 except Exception as e:
