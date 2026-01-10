@@ -19,7 +19,7 @@ from datetime import datetime
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # --- AYARLAR ---
-API_KEY = "AIzaSyAgcsXUyxdt1nJrdmYfgV9rsgxKLBVIp0k"
+API_KEY = os.environ.get("GOOGLE_API_KEY", "AIzaSyAgcsXUyxdt1nJrdmYfgV9rsgxKLBVIp0k")
 client = genai.Client(api_key=API_KEY)
 
 CONFIG_DOSYASI = "config.json"
@@ -208,7 +208,7 @@ def caption_yaz(haber_basligi):
     Amaç: CHP tabanını ateşlemek.
     Üslup: Sert, coşkulu, Atatürkçü.
     Uzunluk: Kısa, Instagram caption formatında.
-    Hashtagler: #CHP #ÖzgürÖzel #İmamoğlu #HalkınİktidarI #Gündem
+    Hashtagler: #CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem
     """
     try:
         log(f"📝 Caption oluşturuluyor: {haber_basligi[:50]}...", "info")
@@ -221,9 +221,13 @@ def caption_yaz(haber_basligi):
         return caption
     except Exception as e:
         log(f"⚠️ Caption hatası: {str(e)}", "warning")
-        # Fallback caption oluştur
-        fallback = f"🔴 {haber_basligi}\n\n#CHP #DailyCHP #Gündem #Siyaset"
-        return fallback
+        # Güçlü fallback caption oluştur
+        fallback_templates = [
+            f"🔴 {haber_basligi}\n\n💪 Halkın iktidarı yakındır! CHP olarak milletimizin yanındayız, yanında olmaya devam edeceğiz!\n\n#CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem #DailyCHP #Siyaset",
+            f"🔴 {haber_basligi}\n\n✊ Mustafa Kemal'in izinde, halkın yanında! Adalet, eşitlik ve özgürlük için mücadelemiz sürecek!\n\n#CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem #DailyCHP #Siyaset",
+            f"🔴 {haber_basligi}\n\n🇹🇷 Altı okumuz rehberimiz, milletimiz gücümüz! CHP olarak her zaman halkın sesi olacağız!\n\n#CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem #DailyCHP #Siyaset"
+        ]
+        return random.choice(fallback_templates)
 
 def logoyu_bas_ve_kaydet(img_obj, logo_yolu, dosya_adi):
     try:
