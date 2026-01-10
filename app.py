@@ -3,9 +3,7 @@ CHP Devrim Makinesi - Web Dashboard
 Flask tabanlı modern arayüz
 """
 
-# Eventlet monkey patching - EN BAŞTA OLMALI
-import eventlet
-eventlet.monkey_patch()
+# Eventlet kaldırıldı - Threading kullanılıyor
 
 # Recursion limit artır (Render'da gerekli olabiliyor)
 import sys
@@ -23,7 +21,7 @@ import haber_motoru as motor
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'chp-devrim-makinesi-2024')
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # Şifre - environment variable veya varsayılan
 APP_PASSWORD = os.environ.get('APP_PASSWORD', 'chp2024')
