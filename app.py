@@ -3,6 +3,14 @@ CHP Devrim Makinesi - Web Dashboard
 Flask tabanlı modern arayüz
 """
 
+# Eventlet monkey patching - EN BAŞTA OLMALI
+import eventlet
+eventlet.monkey_patch()
+
+# Recursion limit artır (Render'da gerekli olabiliyor)
+import sys
+sys.setrecursionlimit(3000)
+
 from flask import Flask, render_template, jsonify, request, send_from_directory, redirect, url_for, session
 from flask_socketio import SocketIO, emit
 from functools import wraps
