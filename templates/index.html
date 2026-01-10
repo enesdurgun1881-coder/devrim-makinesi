@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHP Devrim Makinesi | Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+    <!-- Arka Plan Efektleri -->
+    <div class="bg-gradient"></div>
+    <div class="bg-pattern"></div>
+
+    <!-- Ana Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 100 100" class="six-arrows">
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="3" />
+                        <line x1="50" y1="15" x2="50" y2="85" stroke="currentColor" stroke-width="2" />
+                        <line x1="20" y1="35" x2="80" y2="65" stroke="currentColor" stroke-width="2" />
+                        <line x1="20" y1="65" x2="80" y2="35" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h1>Devrim Makinesi</h1>
+                    <span class="tagline">CHP Haber Otomasyon Sistemi</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="connection-status" id="connectionStatus">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Bağlanıyor...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="dashboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                Dashboard
+            </button>
+            <button class="nav-tab" data-tab="gallery">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                Galeri
+            </button>
+            <button class="nav-tab" data-tab="editor">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                Editör
+            </button>
+            <button class="nav-tab" data-tab="settings">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                    </path>
+                </svg>
+                Ayarlar
+            </button>
+            <button class="nav-tab" data-tab="archive">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="21 8 21 21 3 21 3 8"></polyline>
+                    <rect x="1" y="3" width="22" height="5"></rect>
+                    <line x1="10" y1="12" x2="14" y2="12"></line>
+                </svg>
+                Arşiv
+            </button>
+        </nav>
+
+        <!-- Tab Contents -->
+        <main class="main-content">
+            <!-- Dashboard Tab -->
+            <section class="tab-content active" id="dashboard">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon red">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statPosts">0</span>
+                            <span class="stat-label">Toplam Post</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statArchive">0</span>
+                            <span class="stat-label">Arşivlenen Haber</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M4 11a9 9 0 0 1 9 9"></path>
+                                <path d="M4 4a16 16 0 0 1 16 16"></path>
+                                <circle cx="5" cy="19" r="1"></circle>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statRss">0</span>
+                            <span class="stat-label">RSS Kaynağı</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="4" y1="9" x2="20" y2="9"></line>
+                                <line x1="4" y1="15" x2="20" y2="15"></line>
+                                <line x1="10" y1="3" x2="8" y2="21"></line>
+                                <line x1="16" y1="3" x2="14" y2="21"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statKeywords">0</span>
+                            <span class="stat-label">Anahtar Kelime</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scan Control Panel -->
+                <div class="control-panel glass-card">
+                    <div class="panel-header">
+                        <h2>🚀 Haber Tarama Kontrol</h2>
+                        <span class="target-badge">Hedef: <strong id="targetCount">3</strong> haber</span>
+                    </div>
+
+                    <div class="progress-container" id="progressContainer" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <span class="progress-text" id="progressText">Hazırlanıyor...</span>
+                    </div>
+
+                    <div class="control-buttons">
+                        <button class="btn btn-primary btn-large" id="btnStartScan">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                            Taramayı Başlat
+                        </button>
+                        <button class="btn btn-danger" id="btnStopScan" disabled>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="6" y="6" width="12" height="12"></rect>
+                            </svg>
+                            Durdur
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Log -->
+                <div class="log-panel glass-card">
+                    <div class="panel-header">
+                        <h2>📋 Canlı Log</h2>
+                        <button class="btn btn-ghost btn-small" id="btnClearLog">Temizle</button>
+                    </div>
+                    <div class="log-container" id="logContainer">
+                        <div class="log-entry info">
+                            <span class="log-time">[--:--:--]</span>
+                            <span class="log-message">Sistem hazır. Tarama başlatmak için butona basın.</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gallery Tab -->
+            <section class="tab-content" id="gallery">
+                <div class="section-header">
+                    <h2>🖼️ Post Galerisi</h2>
+                    <button class="btn btn-ghost" id="btnRefreshGallery">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <polyline points="1 20 1 14 7 14"></polyline>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                        </svg>
+                        Yenile
+                    </button>
+                </div>
+                <div class="gallery-grid" id="galleryGrid">
+                    <!-- Posts loaded dynamically -->
+                </div>
+            </section>
+
+            <!-- Editor Tab -->
+            <section class="tab-content" id="editor">
+                <div class="section-header">
+                    <h2>🎨 Fotoğraf Editörü</h2>
+                    <button class="btn btn-primary" id="btnSaveDesign">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        </svg>
+                        Post Olarak Kaydet
+                    </button>
+                </div>
+
+                <div class="editor-layout">
+                    <!-- Sol Panel: Önizleme -->
+                    <div class="editor-preview glass-card">
+                        <div class="preview-container" id="previewContainer">
+                            <div class="preview-placeholder" id="previewPlaceholder">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <p>Görsel yükleyin veya galeriden seçin</p>
+                            </div>
+                            <canvas id="editorCanvas" style="display: none;"></canvas>
+                        </div>
+                        <div class="preview-actions">
+                            <label class="btn btn-ghost" for="imageUpload">
+                                📤 Görsel Yükle
+                            </label>
+                            <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                            <button class="btn btn-ghost" id="btnSelectFromGallery">
+                                🖼️ Galeriden Seç
+                            </button>
+                            <button class="btn btn-ghost" id="btnGenerateAI">
+                                🤖 AI Oluştur
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sağ Panel: Araçlar -->
+                    <div class="editor-tools">
+                        <!-- Şablon Seçici -->
+                        <div class="tool-section glass-card">
+                            <h3>📐 Şablon Seç</h3>
+                            <div class="template-grid" id="templateGrid">
+                                <div class="template-item active" data-template="haber">
+                                    <div class="template-preview template-haber"></div>
+                                    <span>Haber</span>
+                                </div>
+                                <div class="template-item" data-template="duyuru">
+                                    <div class="template-preview template-duyuru"></div>
+                                    <span>Duyuru</span>
+                                </div>
+                                <div class="template-item" data-template="alinti">
+                                    <div class="template-preview template-alinti"></div>
+                                    <span>Alıntı</span>
+                                </div>
+                                <div class="template-item" data-template="minimal">
+                                    <div class="template-preview template-minimal"></div>
+                                    <span>Minimal</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Metin Ayarları -->
+                        <div class="tool-section glass-card">
+                            <h3>✏️ Metin</h3>
+                            <div class="form-group">
+                                <label>Başlık</label>
+                                <textarea id="editorTitle" rows="2" placeholder="Haber başlığını yazın..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Alt Yazı (opsiyonel)</label>
+                                <input type="text" id="editorSubtitle" placeholder="Kaynak, tarih vb.">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Yazı Boyutu</label>
+                                    <input type="range" id="editorFontSize" min="24" max="72" value="42">
+                                </div>
+                                <div class="form-group">
+                                    <label>Konum</label>
+                                    <select id="editorTextPosition">
+                                        <option value="bottom">Alt</option>
+                                        <option value="top">Üst</option>
+                                        <option value="center">Orta</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Marka Ayarları -->
+                        <div class="tool-section glass-card">
+                            <h3>🏷️ Marka</h3>
+                            <div class="form-group checkbox-group">
+                                <label>
+                                    <input type="checkbox" id="editorShowLogo" checked>
+                                    Logo göster
+                                </label>
+                            </div>
+                            <div class="form-group checkbox-group">
+                                <label>
+                                    <input type="checkbox" id="editorShowBrand" checked>
+                                    "DAILY CHP" etiketi
+                                </label>
+                            </div>
+                            <div class="form-group checkbox-group">
+                                <label>
+                                    <input type="checkbox" id="editorShowGradient" checked>
+                                    Gradient overlay
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Filtreler -->
+                        <div class="tool-section glass-card">
+                            <h3>🎨 Filtreler</h3>
+                            <div class="form-group">
+                                <label>Parlaklık</label>
+                                <input type="range" id="filterBrightness" min="50" max="150" value="100">
+                            </div>
+                            <div class="form-group">
+                                <label>Kontrast</label>
+                                <input type="range" id="filterContrast" min="50" max="150" value="100">
+                            </div>
+                            <div class="form-group">
+                                <label>Doygunluk</label>
+                                <input type="range" id="filterSaturation" min="0" max="200" value="100">
+                            </div>
+                            <div class="form-group">
+                                <label>Bulanıklık</label>
+                                <input type="range" id="filterBlur" min="0" max="10" value="0">
+                            </div>
+                            <button class="btn btn-ghost btn-small" id="btnResetFilters" style="width: 100%;">
+                                🔄 Filtreleri Sıfırla
+                            </button>
+                        </div>
+
+                        <!-- Metin Renkleri -->
+                        <div class="tool-section glass-card">
+                            <h3>🌈 Renkler</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Metin Rengi</label>
+                                    <input type="color" id="colorText" value="#ffffff" class="color-picker">
+                                </div>
+                                <div class="form-group">
+                                    <label>Gölge Rengi</label>
+                                    <input type="color" id="colorShadow" value="#000000" class="color-picker">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Accent Rengi</label>
+                                <input type="color" id="colorAccent" value="#E30A17" class="color-picker">
+                            </div>
+                        </div>
+
+                        <!-- Hızlı Eylemler -->
+                        <div class="tool-section glass-card">
+                            <h3>⚡ Hızlı Eylemler</h3>
+                            <div class="quick-actions">
+                                <button class="btn btn-ghost" id="btnApplyTemplate">
+                                    🎯 Şablonu Uygula
+                                </button>
+                                <button class="btn btn-ghost" id="btnResetEditor">
+                                    🔄 Sıfırla
+                                </button>
+                                <button class="btn btn-primary" id="btnDownloadDesign">
+                                    ⬇️ İndir
+                                </button>
+                                <button class="btn btn-primary" id="btnShareInstagram"
+                                    style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);">
+                                    📷 Instagram'a Paylaş
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gallery Selection Modal -->
+            <div class="modal" id="gallerySelectModal">
+                <div class="modal-content glass-card" style="max-width: 800px;">
+                    <button class="modal-close" id="gallerySelectClose">&times;</button>
+                    <h2 style="margin-bottom: 20px;">🖼️ Galeriden Görsel Seç</h2>
+                    <div class="gallery-grid" id="gallerySelectGrid" style="max-height: 400px; overflow-y: auto;">
+                        <!-- Posts loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <section class="tab-content" id="settings">
+                <div class="section-header">
+                    <h2>⚙️ Ayarlar</h2>
+                    <button class="btn btn-primary" id="btnSaveSettings">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        Kaydet
+                    </button>
+                </div>
+
+                <div class="settings-grid">
+                    <!-- General Settings -->
+                    <div class="settings-card glass-card">
+                        <h3>Genel Ayarlar</h3>
+                        <div class="form-group">
+                            <label for="settingTarget">Hedef Haber Sayısı</label>
+                            <input type="number" id="settingTarget" min="1" max="20" value="3">
+                        </div>
+                        <div class="form-group">
+                            <label for="settingTextModel">Metin Modeli</label>
+                            <select id="settingTextModel">
+                                <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                                <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="settingImageModel">Görsel Modeli</label>
+                            <select id="settingImageModel">
+                                <option value="imagen-3.0-generate-001">Imagen 3.0</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Keywords -->
+                    <div class="settings-card glass-card">
+                        <h3>Anahtar Kelimeler</h3>
+                        <div class="form-group">
+                            <label>Her satıra bir kelime yazın</label>
+                            <textarea id="settingKeywords" rows="10"
+                                placeholder="chp&#10;ekrem imamoğlu&#10;özgür özel"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- RSS Sources -->
+                    <div class="settings-card glass-card full-width">
+                        <h3>RSS Kaynakları</h3>
+                        <div class="form-group">
+                            <label>Her satıra bir RSS URL yazın</label>
+                            <textarea id="settingRss" rows="8" placeholder="https://example.com/rss"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Instagram -->
+                    <div class="settings-card glass-card full-width">
+                        <h3>📷 Instagram Hesabı</h3>
+                        <div class="instagram-status" id="instagramStatus">
+                            <span class="status-dot disconnected"></span>
+                            <span>Bağlı değil</span>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Kullanıcı Adı</label>
+                                <input type="text" id="settingInstaUser" placeholder="instagram_username">
+                            </div>
+                            <div class="form-group">
+                                <label>Şifre</label>
+                                <input type="password" id="settingInstaPass" placeholder="••••••••">
+                            </div>
+                        </div>
+                        <div class="control-buttons" style="margin-top: 16px;">
+                            <button class="btn btn-primary" id="btnInstaLogin">
+                                🔐 Instagram'a Giriş Yap
+                            </button>
+                            <button class="btn btn-ghost" id="btnInstaLogout">
+                                🚪 Çıkış
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Archive Tab -->
+            <section class="tab-content" id="archive">
+                <div class="section-header">
+                    <h2>📋 Arşiv</h2>
+                    <button class="btn btn-danger" id="btnClearArchive">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                            </path>
+                        </svg>
+                        Arşivi Temizle
+                    </button>
+                </div>
+                <div class="archive-info glass-card">
+                    <p>Arşivde <strong id="archiveCount">0</strong> haber bulunuyor. Bu haberler tekrar işlenmeyecek.
+                    </p>
+                </div>
+                <div class="archive-list" id="archiveList">
+                    <!-- Archive links loaded dynamically -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Daily CHP Haber | Made with Enes Durgun for CHP</p>
+        </footer>
+    </div>
+
+    <!-- Modal for Post Preview -->
+    <div class="modal" id="postModal">
+        <div class="modal-content glass-card">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <img id="modalImage" src="" alt="Post Preview">
+            <div class="modal-info">
+                <div class="modal-caption-container">
+                    <p id="modalCaption"></p>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="copyModalCaption()">
+                        📋 Caption Kopyala
+                    </button>
+                    <a id="modalDownload" href="" download class="btn btn-ghost">
+                        ⬇️ İndir
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+
+</html>
