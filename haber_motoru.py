@@ -5,8 +5,7 @@ Orijinal makine.py'den refactor edildi
 
 import requests
 from bs4 import BeautifulSoup
-from google import genai
-from google.genai import types
+import google.generativeai as genai
 from PIL import Image, ImageDraw, ImageFont
 import os
 from io import BytesIO
@@ -20,7 +19,10 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # --- AYARLAR ---
 API_KEY = os.environ.get("GOOGLE_API_KEY", "AIzaSyAgcsXUyxdt1nJrdmYfgV9rsgxKLBVIp0k")
-client = genai.Client(api_key=API_KEY)
+try:
+    genai.configure(api_key=API_KEY)
+except Exception as e:
+    print(f"GenAI Config Hatası: {e}")
 
 CONFIG_DOSYASI = "config.json"
 ARSIV_DOSYASI = "arsiv.txt"
@@ -126,25 +128,7 @@ def post_sil(dosya_adi):
 
 # --- RESİM VE AI FONKSİYONLARI ---
 def yapay_zeka_resim_ciz_chp():
-    log("🎨 AI Ressam çiziyor...", "info")
-    config = config_yukle()
-    prompt = """
-    A high quality, photorealistic close-up shot of a waving Republican People's Party (CHP) flag with 6 arrows next to a Turkish flag. 
-    Background: Blurred political rally atmosphere, crowd, dramatic lighting. 
-    Style: Professional news photography.
-    """
-    try:
-        response = client.models.generate_images(
-            model=config.get("image_model", "imagen-3.0-generate-001"),
-            prompt=prompt,
-            config=types.GenerateImagesConfig(number_of_images=1, aspect_ratio="1:1")
-        )
-        if response.generated_images:
-            image_bytes = response.generated_images[0].image.image_bytes
-            return Image.open(BytesIO(image_bytes))
-    except Exception as e:
-        log(f"❌ AI resim hatası: {e}", "error")
-        return None
+    # Pollinations kullanıldığı için burası devre dışı bırakıldı
     return None
 
 def resim_indir_zorla(haber_linki):
@@ -201,7 +185,7 @@ def resim_indir_zorla(haber_linki):
     return None
 
 def caption_yaz(haber_basligi):
-    """AI ile caption oluştur - birden fazla model dener"""
+    """AI ile caption oluştur - google-generativeai kütüphanesi ile"""
     prompt = f"""
     Haber: {haber_basligi}
     Rol: 'Daily CHP' fanatik admini.
@@ -211,35 +195,26 @@ def caption_yaz(haber_basligi):
     Hashtagler: #CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem
     """
     
-    # Denenecek modeller (sırayla dener, biri çalışana kadar)
+    # Denenecek modeller
     models_to_try = [
         "gemini-1.5-flash",
-        "gemini-1.5-pro", 
         "gemini-pro",
         "gemini-1.0-pro"
     ]
     
     for model_name in models_to_try:
         try:
-            log(f"📝 Caption deniyor ({model_name}): {haber_basligi[:40]}...", "info")
-            response = client.models.generate_content(
-                model=model_name, 
-                contents=prompt
-            )
-            caption = response.text
-            log(f"✅ Caption hazır ({model_name}): {caption[:50]}...", "success")
-            return caption
+            log(f"📝 Caption deniyor ({model_name})...", "info")
+            model = genai.GenerativeModel(model_name)
+            response = model.generate_content(prompt)
+            
+            if response and response.text:
+                caption = response.text
+                log(f"✅ Caption hazır ({model_name}): {caption[:50]}...", "success")
+                return caption
         except Exception as e:
-            error_str = str(e)
-            if "404" in error_str or "NOT_FOUND" in error_str:
-                log(f"⚠️ Model bulunamadı: {model_name}, sonraki deneniyor...", "warning")
-                continue
-            elif "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
-                log(f"⚠️ Kota aşıldı: {model_name}, sonraki deneniyor...", "warning")
-                continue
-            else:
-                log(f"⚠️ API hatası ({model_name}): {error_str[:100]}", "warning")
-                continue
+            log(f"⚠️ Model hatası ({model_name}): {str(e)[:100]}", "warning")
+            continue
     
     # Tüm modeller başarısız olduysa fallback kullan
     log("⚠️ Tüm modeller başarısız, fallback caption kullanılıyor", "warning")
