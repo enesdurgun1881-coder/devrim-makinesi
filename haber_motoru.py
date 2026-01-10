@@ -201,7 +201,7 @@ def resim_indir_zorla(haber_linki):
     return None
 
 def caption_yaz(haber_basligi):
-    config = config_yukle()
+    """AI ile caption oluştur - birden fazla model dener"""
     prompt = f"""
     Haber: {haber_basligi}
     Rol: 'Daily CHP' fanatik admini.
@@ -210,19 +210,40 @@ def caption_yaz(haber_basligi):
     Uzunluk: Kısa, Instagram caption formatında.
     Hashtagler: #CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem
     """
-    try:
-        log(f"📝 Caption oluşturuluyor: {haber_basligi[:50]}...", "info")
-        response = client.models.generate_content(
-            model=config.get("text_model", "gemini-1.5-flash"), 
-            contents=prompt
-        )
-        caption = response.text
-        log(f"✅ Caption hazır: {caption[:50]}...", "success")
-        return caption
-    except Exception as e:
-        log(f"⚠️ Caption hatası: {str(e)}", "warning")
-        # Güçlü fallback caption oluştur
-        fallback_templates = [
+    
+    # Denenecek modeller (sırayla dener, biri çalışana kadar)
+    models_to_try = [
+        "gemini-1.5-flash",
+        "gemini-1.5-pro", 
+        "gemini-pro",
+        "gemini-1.0-pro"
+    ]
+    
+    for model_name in models_to_try:
+        try:
+            log(f"📝 Caption deniyor ({model_name}): {haber_basligi[:40]}...", "info")
+            response = client.models.generate_content(
+                model=model_name, 
+                contents=prompt
+            )
+            caption = response.text
+            log(f"✅ Caption hazır ({model_name}): {caption[:50]}...", "success")
+            return caption
+        except Exception as e:
+            error_str = str(e)
+            if "404" in error_str or "NOT_FOUND" in error_str:
+                log(f"⚠️ Model bulunamadı: {model_name}, sonraki deneniyor...", "warning")
+                continue
+            elif "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+                log(f"⚠️ Kota aşıldı: {model_name}, sonraki deneniyor...", "warning")
+                continue
+            else:
+                log(f"⚠️ API hatası ({model_name}): {error_str[:100]}", "warning")
+                continue
+    
+    # Tüm modeller başarısız olduysa fallback kullan
+    log("⚠️ Tüm modeller başarısız, fallback caption kullanılıyor", "warning")
+    fallback_templates = [
             f"🔴 {haber_basligi}\n\n💪 Halkın iktidarı yakındır! CHP olarak milletimizin yanındayız, yanında olmaya devam edeceğiz!\n\n#CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem #DailyCHP #Siyaset",
             f"🔴 {haber_basligi}\n\n✊ Mustafa Kemal'in izinde, halkın yanında! Adalet, eşitlik ve özgürlük için mücadelemiz sürecek!\n\n#CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem #DailyCHP #Siyaset",
             f"🔴 {haber_basligi}\n\n🇹🇷 Altı okumuz rehberimiz, milletimiz gücümüz! CHP olarak her zaman halkın sesi olacağız!\n\n#CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem #DailyCHP #Siyaset"
