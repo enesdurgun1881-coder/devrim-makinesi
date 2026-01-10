@@ -40,5 +40,5 @@
         "https://www.birgun.net/feed",
         "https://www.independentturkish.com/tr/taxonomy/term/1/feed"
     ],
-    "text_model": "gemini-2.5-flash"
+    "text_model": "gemini-1.5-flash"
 }

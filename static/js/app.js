@@ -292,7 +292,7 @@ async function loadSettings() {
         const settings = await response.json();
 
         document.getElementById('settingTarget').value = settings.hedef_haber_sayisi || 3;
-        document.getElementById('settingTextModel').value = settings.text_model || 'gemini-2.5-flash';
+        document.getElementById('settingTextModel').value = settings.text_model || 'gemini-1.5-flash';
         document.getElementById('settingImageModel').value = settings.image_model || 'imagen-3.0-generate-001';
         document.getElementById('settingKeywords').value = (settings.anahtar_kelimeler || []).join('\n');
         document.getElementById('settingRss').value = (settings.rss_kaynaklari || []).join('\n');

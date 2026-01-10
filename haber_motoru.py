@@ -50,7 +50,7 @@ def config_yukle():
             return json.load(f)
     return {
         "hedef_haber_sayisi": 3,
-        "text_model": "gemini-2.5-flash",
+        "text_model": "gemini-1.5-flash",
         "image_model": "imagen-3.0-generate-001",
         "anahtar_kelimeler": [],
         "rss_kaynaklari": []
@@ -213,7 +213,7 @@ def caption_yaz(haber_basligi):
     try:
         log(f"📝 Caption oluşturuluyor: {haber_basligi[:50]}...", "info")
         response = client.models.generate_content(
-            model=config.get("text_model", "gemini-2.5-flash"), 
+            model=config.get("text_model", "gemini-1.5-flash"), 
             contents=prompt
         )
         caption = response.text
