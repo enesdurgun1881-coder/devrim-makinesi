@@ -12,6 +12,7 @@ from io import BytesIO
 import urllib3
 import random
 import json
+import time
 from datetime import datetime
 
 # SSL Sustur
@@ -594,6 +595,11 @@ def uretim_baslat(progress_callback=None, profesyonel_mod=True):
             })
         
         baslangic_no += 1
+        
+        # Rate limit koruması - Google API'nin nefes almasını bekle
+        if i < len(stok) - 1:  # Son haber değilse bekle
+            log("💤 API soğutma molası (15 saniye)...", "info")
+            time.sleep(15)
     
     log(f"✅ Operasyon tamamlandı! {len(uretilen_postlar)} post üretildi.", "success")
     return uretilen_postlar
