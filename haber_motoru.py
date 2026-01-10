@@ -208,16 +208,22 @@ def caption_yaz(haber_basligi):
     Amaç: CHP tabanını ateşlemek.
     Üslup: Sert, coşkulu, Atatürkçü.
     Uzunluk: Kısa, Instagram caption formatında.
-    Hashtagler: #CHP #ÖzgürÖzel #İmamoğlu #Halkınİktidarı #Gündem
+    Hashtagler: #CHP #ÖzgürÖzel #İmamoğlu #HalkınİktidarI #Gündem
     """
     try:
+        log(f"📝 Caption oluşturuluyor: {haber_basligi[:50]}...", "info")
         response = client.models.generate_content(
             model=config.get("text_model", "gemini-2.5-flash"), 
             contents=prompt
         )
-        return response.text
-    except:
-        return "Caption oluşturulamadı."
+        caption = response.text
+        log(f"✅ Caption hazır: {caption[:50]}...", "success")
+        return caption
+    except Exception as e:
+        log(f"⚠️ Caption hatası: {str(e)}", "warning")
+        # Fallback caption oluştur
+        fallback = f"🔴 {haber_basligi}\n\n#CHP #DailyCHP #Gündem #Siyaset"
+        return fallback
 
 def logoyu_bas_ve_kaydet(img_obj, logo_yolu, dosya_adi):
     try:
