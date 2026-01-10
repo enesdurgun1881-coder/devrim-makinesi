@@ -489,13 +489,13 @@ def haber_tara(limit=None, progress_callback=None):
                     # Resmi al
                     img_obj = resim_indir_zorla(link)
                     if not img_obj:
-                        img_obj = yapay_zeka_resim_ciz_chp()
+                        # Fallback: Basit bir placeholder oluştur
+                        log("⚠️ Görsel indirilemedi, placeholder oluşturuluyor...", "warning")
+                        img_obj = Image.new('RGB', (1080, 1080), color=(200, 16, 46))  # CHP kırmızısı
                     
                     if img_obj:
                         log(f"✅ Haber hazır! ({len(toplanan_haberler)+1}/{limit})", "success")
                         toplanan_haberler.append((baslik, img_obj, link))
-                    else:
-                        log("⚠️ Görsel bulunamadı, pas geçiliyor.", "warning")
                         
         except Exception as e:
             log(f"⚠️ RSS hatası: {str(e)[:50]}", "warning")
