@@ -546,6 +546,24 @@ def uretim_baslat(progress_callback=None, profesyonel_mod=True):
     """
     log("🚀 Seri üretim başlatıldı!", "info")
     
+    # --- DIAGNOSTIC START ---
+    log("🔍 Sistem Kontrolü Yapılıyor...", "info")
+    if not API_KEY:
+        log("❌ KRİTİK HATA: GOOGLE_API_KEY bulunamadı! Render Environment ayarlarını kontrol et.", "error")
+    else:
+        log(f"✅ API Key tespit edildi: {API_KEY[:5]}...{API_KEY[-3:]}", "success")
+        
+    try:
+        import google.generativeai as genai_debug
+        log(f"ℹ️ Kütüphane Sürümü: {genai_debug.__version__}", "info")
+        
+        # Test bağlantısı
+        models = list(genai_debug.list_models())
+        log(f"📡 API Bağlantısı Başarılı! {len(models)} model erişilebilir.", "success")
+    except Exception as e:
+        log(f"⚠️ API Bağlantı Testi Başarısız: {str(e)}", "warning")
+    # --- DIAGNOSTIC END ---
+    
     stok = haber_tara(progress_callback=progress_callback)
     
     if not stok:
