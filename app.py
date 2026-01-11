@@ -247,7 +247,6 @@ def generate_ai_image():
 # --- INSTAGRAM API ---
 instagram_client = None
 
-@app.route('/api/instagram/login', methods=['POST'])
 @app.route('/api/instagram/import_session', methods=['POST'])
 def import_instagram_session():
     """Instagram oturum dosyasını (JSON) manuel yükle"""
