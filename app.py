@@ -268,6 +268,33 @@ def import_instagram_session():
         else:
             settings = session_content
             
+        # Eğer liste formatındaysa (Cookie-Editor'den geliyorsa) dönüştür
+        if isinstance(settings, list):
+            cookies = {}
+            for cookie in settings:
+                if isinstance(cookie, dict) and 'name' in cookie and 'value' in cookie:
+                    cookies[cookie['name']] = cookie['value']
+            
+            # Instagrapi formatına çevir
+            settings = {
+                "cookies": cookies,
+                "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "device_settings": {
+                    "app_version": "Web",
+                    "android_version": 0,
+                    "android_release": "0",
+                    "dpi": "0dpi",
+                    "resolution": "0x0",
+                    "manufacturer": "Web",
+                    "device": "Web",
+                    "model": "Web",
+                    "cpu": "Web"
+                },
+                "country": "TR",
+                "locale": "tr_TR",
+                "timezone_offset": 10800
+            }
+            
         # Dosyaya kaydet
         with open('instagram_session.json', 'w') as f:
             json.dump(settings, f)
