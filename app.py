@@ -247,6 +247,78 @@ def generate_ai_image():
 # --- INSTAGRAM API ---
 instagram_client = None
 
+def init_instagram_client():
+    """Instagram istemcisini güvenli başlat (Session öncelikli)"""
+    global instagram_client, instagram_logged_in, instagram_username
+    
+    try:
+        from instagrapi import Client
+        from instagrapi.exceptions import LoginRequired, TwoFactorRequired, ChallengeRequired
+        
+        config = motor.config_yukle()
+        username = config.get('instagram_username', '')
+        password = config.get('instagram_password', '')
+        
+        if not username or not password:
+            return None, "Kullanıcı adı/şifre eksik"
+
+        client = Client()
+        client.delay_range = [1, 3]
+        
+        session_file = 'instagram_session.json'
+        if os.path.exists(session_file):
+            print(f"📂 Session bulundu: {session_file}")
+            try:
+                client.load_settings(session_file)
+                # Session test
+                client.get_timeline_feed()
+                print("✅ Session geçerli, login atlanıyor.")
+                
+                # CSRF fix
+                csrf = client.cookie_dict.get('csrftoken')
+                if csrf:
+                    client.headers.update({'X-CSRFToken': csrf})
+                
+                instagram_client = client
+                instagram_logged_in = True
+                instagram_username = username
+                return client, None
+            except (LoginRequired, TwoFactorRequired, ChallengeRequired) as e:
+                print(f"⚠️ Session geçersiz veya doğrulama gerekli: {e}")
+            except Exception as e:
+                print(f"⚠️ Session yüklenirken hata: {e}")
+        
+        # Fallback: Normal login
+        print("🔄 Normal login deneniyor...")
+        client.login(username, password)
+        instagram_client = client
+        instagram_logged_in = True
+        instagram_username = username
+        
+        # Yeni session kaydet
+        client.dump_settings(session_file)
+        return client, None
+        
+    except (LoginRequired, TwoFactorRequired, ChallengeRequired) as e:
+        error_msg = str(e)
+        if isinstance(e, TwoFactorRequired):
+            error_msg = '2FA aktif! Instagram ayarlarından iki adımlı doğrulamayı geçici olarak kapatın.'
+        elif isinstance(e, ChallengeRequired):
+            error_msg = 'Instagram doğrulama istiyor. Uygulamadan giriş yapın.'
+        elif isinstance(e, LoginRequired):
+            error_msg = 'Giriş başarısız. Bilgileri kontrol edin.'
+        print(f"❌ Instagram giriş hatası: {error_msg}")
+        instagram_client = None
+        instagram_logged_in = False
+        instagram_username = ""
+        return None, error_msg
+    except Exception as e:
+        print(f"❌ Init hatası: {e}")
+        instagram_client = None
+        instagram_logged_in = False
+        instagram_username = ""
+        return None, str(e)
+
 @app.route('/api/instagram/import_session', methods=['POST'])
 def import_instagram_session():
     """Instagram oturum dosyasını (JSON) manuel yükle"""
@@ -301,98 +373,26 @@ def import_instagram_session():
             
         print("📥 Instagram session manuel yüklendi")
         
-        # Hemen giriş yapmayı dene
-        return instagram_login()
-
+        # Yeni helper'ı kullan
+        client, error = init_instagram_client()
+        if client:
+             return jsonify({'success': True, 'message': 'Session başarıyla yüklendi!'})
+        else:
+             return jsonify({'success': False, 'error': error})
+             
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/api/instagram/login', methods=['POST'])
 def instagram_login():
     """Instagram'a giriş yap ve oturumu kaydet"""
-    global instagram_client
+    client, error = init_instagram_client()
     
-    try:
-        from instagrapi import Client
-        from instagrapi.exceptions import LoginRequired, TwoFactorRequired, ChallengeRequired
-        
-        config = motor.config_yukle()
-        username = config.get('instagram_username', '')
-        password = config.get('instagram_password', '')
-        
-        print(f"🔐 Instagram giriş deneniyor: @{username}")
-        
-        if not username or not password:
-            return jsonify({'success': False, 'error': 'Instagram bilgileri ayarlardan girilmeli'})
-        
-        instagram_client = Client()
-        instagram_client.delay_range = [1, 3]  # Rate limit koruması
-        
-        # Session dosyası varsa kullan
-        session_file = 'instagram_session.json'
-        try:
-            if os.path.exists(session_file):
-                websocket_log("📂 Session dosyası bulundu, yükleniyor...", "info")
-                instagram_client.load_settings(session_file)
-                
-                # Session geçerli mi kontrol et (Login yapmadan)
-                try:
-                    # Basit bir istek atarak session'ı test et
-                    instagram_client.get_timeline_feed()
-                    websocket_log("✅ Session geçerli! Şifreli giriş atlanıyor.", "success")
-                    
-                    # CSRF token kontrolü ve yenileme
-                    try:
-                        csrf = instagram_client.cookie_dict.get('csrftoken')
-                        if csrf:
-                            instagram_client.headers.update({'X-CSRFToken': csrf})
-                            # websocket_log(f"🔧 CSRF Token güncellendi: {csrf[:5]}...", "info")
-                    except:
-                        pass
-                    
-                    # Başarılı dönüş ve durum güncelleme
-                    global instagram_logged_in, instagram_username
-                    instagram_logged_in = True
-                    instagram_username = username
-                    
-                    return jsonify({'success': True, 'message': f'@{username} hesabına session ile giriş yapıldı!'})
-                        
-                except Exception as e:
-                    websocket_log(f"⚠️ Session geçersiz: {str(e)[:50]}", "warning")
-                    websocket_log("🔄 Normal giriş deneniyor...", "info")
-                    instagram_client.login(username, password)
-            else:
-                websocket_log("🔐 Yeni giriş yapılıyor...", "info")
-                instagram_client.login(username, password)
-                websocket_log("✅ Giriş başarılı!", "success")
-            
-            # Session'ı kaydet
-            instagram_client.dump_settings(session_file)
-            
-            # Global durumu güncelle
-            instagram_logged_in = True
-            instagram_username = username
-            
-            return jsonify({'success': True, 'message': f'@{username} hesabına giriş yapıldı!'})
-            
-        except TwoFactorRequired:
-            instagram_client = None
-            websocket_log("⚠️ Instagram 2FA kodu istiyor!", "error")
-            return jsonify({'success': False, 'error': '2FA aktif! Instagram ayarlarından iki adımlı doğrulamayı geçici olarak kapatın.'})
-        except ChallengeRequired:
-            instagram_client = None
-            websocket_log("⚠️ Instagram doğrulama (Challenge) istiyor!", "error")
-            return jsonify({'success': False, 'error': 'Instagram doğrulama istiyor. Uygulamadan giriş yapın.'})
-        except LoginRequired:
-            instagram_client = None
-            websocket_log("❌ Giriş başarısız: Kullanıcı adı/şifre yanlış.", "error")
-            return jsonify({'success': False, 'error': 'Giriş başarısız. Bilgileri kontrol edin.'})
-            
-    except Exception as e:
-        error_msg = str(e)
-        websocket_log(f"❌ Instagram hatası: {error_msg[:100]}", "error")
-        instagram_client = None
-        return jsonify({'success': False, 'error': f'Hata: {error_msg}'})
+    if client:
+        # Global username'i al (init içinde set edildi)
+        return jsonify({'success': True, 'message': f'@{instagram_username} hesabına giriş yapıldı!'})
+    else:
+         return jsonify({'success': False, 'error': error})
 
 # Instagram login durumunu takip et
 instagram_logged_in = False
@@ -411,27 +411,15 @@ def instagram_status():
             'followers': '-'
         })
     
-    # Session dosyası varsa auto-login dene
+    # Session dosyası varsa auto-init dene
     if os.path.exists('instagram_session.json'):
-        try:
-            from instagrapi import Client
-            config = motor.config_yukle()
-            username = config.get('instagram_username', '')
-            password = config.get('instagram_password', '')
-            
-            if username and password:
-                instagram_client = Client()
-                instagram_client.load_settings('instagram_session.json')
-                instagram_client.login(username, password)
-                instagram_logged_in = True
-                instagram_username = username
-                return jsonify({
-                    'connected': True, 
-                    'username': username,
-                    'followers': '-'
-                })
-        except:
-            pass
+         client, error = init_instagram_client()
+         if client:
+             return jsonify({
+                'connected': True, 
+                'username': instagram_username,
+                'followers': '-'
+            })
     
     return jsonify({'connected': False})
 
@@ -440,24 +428,10 @@ def instagram_share():
     """Post'u Instagram'a paylaş"""
     global instagram_client, instagram_logged_in, instagram_username
     
-    # Instagram client yoksa ama session varsa, auto-login dene
+    # Client yoksa ve session varsa, init dene
     if not instagram_client and os.path.exists('instagram_session.json'):
-        try:
-            from instagrapi import Client
-            config = motor.config_yukle()
-            username = config.get('instagram_username', '')
-            password = config.get('instagram_password', '')
-            
-            if username and password:
-                print("🔄 Instagram oturumu yeniden yükleniyor...")
-                instagram_client = Client()
-                instagram_client.load_settings('instagram_session.json')
-                instagram_client.login(username, password)
-                instagram_logged_in = True
-                instagram_username = username
-                print("✅ Oturum yeniden yüklendi!")
-        except Exception as e:
-            print(f"❌ Auto-login hatası: {e}")
+        print("🔄 Share öncesi auto-init deneniyor...")
+        init_instagram_client()
     
     if not instagram_client:
         return jsonify({'success': False, 'error': 'Instagram bağlantısı yok. Önce ayarlardan giriş yapın.'})
@@ -477,6 +451,45 @@ def instagram_share():
         
         # Dosya yolunu düzelt (sadece dosya adı geliyorsa)
         if not os.path.exists(filename):
+            base_dir = os.path.join(app.root_path, 'static', 'output')
+            full_path = os.path.join(base_dir, filename)
+            if os.path.exists(full_path):
+                filename = full_path
+            else:
+                # Bir de ana dizinde ara
+                full_path = os.path.join(app.root_path, filename)
+                if os.path.exists(full_path):
+                    filename = full_path
+        
+        if not os.path.exists(filename):
+             return jsonify({'success': False, 'error': f'Dosya bulunamadı: {filename}'})
+
+        print(f"📤 Paylaşılıyor: {filename}")
+        print(f"📝 Caption: {caption[:100] if caption else 'Boş'}...")
+        
+        # Fotoğrafı tam boyutta paylaş (resize yapma)
+        media = instagram_client.photo_upload(
+            filename, 
+            caption,
+            extra_data={"disable_comments": False}
+        )
+        
+        print(f"✅ Paylaşıldı! Media ID: {media.pk}")
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Instagram\'a paylaşıldı!',
+            'media_id': str(media.pk)
+        })
+        
+    except Exception as e:
+        error_msg = str(e)
+        print(f"❌ Paylaşım hatası: {error_msg}")
+        
+        # Eğer login hatası ise
+        if "login" in error_msg.lower() or "challenge" in error_msg.lower():
+             instagram_client = None # Client'ı sıfırla ki tekrar giriş denesin
+
             if os.path.exists(f"./{filename}"):
                 filename = f"./{filename}"
             else:
