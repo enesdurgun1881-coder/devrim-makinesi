@@ -498,6 +498,23 @@
                                 🚪 Çıkış
                             </button>
                         </div>
+
+                        <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <h4>🔧 Manuel Session Import (IP Hatası Çözümü)</h4>
+                            <p style="font-size: 0.85em; opacity: 0.7; margin-bottom: 10px;">
+                                Render IP'si engellenirse, yerel bilgisayarındaki <code>instagram_session.json</code>
+                                dosyasının içeriğini buraya yapıştır.
+                            </p>
+                            <div class="form-group">
+                                <textarea id="settingSessionJson" rows="3"
+                                    placeholder='{"user_agent": "...", "cookies": {...}}'
+                                    style="font-family: monospace; font-size: 0.8em;"></textarea>
+                            </div>
+                            <button class="btn btn-secondary" onclick="importSession()"
+                                style="width: 100%; margin-top: 10px;">
+                                📥 Session Dosyasını Yükle
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>

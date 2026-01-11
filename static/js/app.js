@@ -1153,3 +1153,46 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(initInstagram, 100);
 });
 
+async function importSession() {
+    const jsonContent = document.getElementById('settingSessionJson').value;
+    if (!jsonContent) {
+        alert("Lütfen JSON içeriğini kutuya yapıştırın!");
+        return;
+    }
+
+    // Basit JSON formatı kontrolü
+    try {
+        JSON.parse(jsonContent);
+    } catch (e) {
+        alert("Yapıştırdığınız veri geçerli bir JSON değil! Lütfen tüm içeriği kopyaladığınızdan emin olun.");
+        return;
+    }
+
+    // Butonu disable et
+    const btn = document.querySelector('button[onclick="importSession()"]');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '⏳ Yükleniyor...';
+    btn.disabled = true;
+
+    try {
+        const res = await fetch('/api/instagram/import_session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_json: jsonContent })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            alert("✅ Session başarıyla yüklendi ve giriş yapıldı!");
+            location.reload();
+        } else {
+            alert("❌ Hata: " + data.error);
+        }
+    } catch (e) {
+        alert("⚠️ Bağlantı hatası: " + e);
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}

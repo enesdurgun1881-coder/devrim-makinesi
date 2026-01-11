@@ -248,6 +248,40 @@ def generate_ai_image():
 instagram_client = None
 
 @app.route('/api/instagram/login', methods=['POST'])
+@app.route('/api/instagram/import_session', methods=['POST'])
+def import_instagram_session():
+    """Instagram oturum dosyasını (JSON) manuel yükle"""
+    global instagram_client
+    
+    try:
+        data = request.json
+        session_content = data.get('session_json')
+        
+        if not session_content:
+             return jsonify({'success': False, 'error': 'Session verisi boş'})
+
+        # JSON olduğunu doğrula
+        if isinstance(session_content, str):
+            try:
+                settings = json.loads(session_content)
+            except:
+                 return jsonify({'success': False, 'error': 'Geçersiz JSON formatı'})
+        else:
+            settings = session_content
+            
+        # Dosyaya kaydet
+        with open('instagram_session.json', 'w') as f:
+            json.dump(settings, f)
+            
+        print("📥 Instagram session manuel yüklendi")
+        
+        # Hemen giriş yapmayı dene
+        return instagram_login()
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/instagram/login', methods=['POST'])
 def instagram_login():
     """Instagram'a giriş yap ve oturumu kaydet"""
     global instagram_client
