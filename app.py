@@ -479,6 +479,10 @@ def instagram_logout():
 @socketio.on('connect')
 def handle_connect():
     emit('log', {'mesaj': '🔌 Bağlantı kuruldu!', 'tip': 'success'})
+    
+    # Yeni bağlanan kullanıcıya güncel durumu bildir
+    if instagram_client:
+        emit('instagram_status', {'connected': True, 'username': 'BAĞLI (Paylaşımlı)'})
 
 @socketio.on('start_scan')
 def handle_start_scan():
