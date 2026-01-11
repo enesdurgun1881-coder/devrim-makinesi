@@ -489,49 +489,9 @@ def instagram_share():
         # Eğer login hatası ise
         if "login" in error_msg.lower() or "challenge" in error_msg.lower():
              instagram_client = None # Client'ı sıfırla ki tekrar giriş denesin
+        return jsonify({'success': False, 'error': f'Hata: {error_msg}'})
 
-            if os.path.exists(f"./{filename}"):
-                filename = f"./{filename}"
-            else:
-                print(f"❌ Dosya bulunamadı: {filename}")
-                return jsonify({'success': False, 'error': f'Dosya bulunamadı: {filename}'})
-        
-        # Caption yoksa veya varsayılan ise, captions.json'dan al
-        if not caption or 'Editörle oluşturuldu' in caption or caption == '':
-            caption_data = motor.caption_getir(os.path.basename(filename))
-            if caption_data:
-                caption = caption_data.get('caption', '')
-                print(f"📝 Caption veritabanından alındı: {caption[:50]}...")
-        
-        # Hashtag'leri ekle
-        hashtags = "\n\n#dailychp #chp #cumhuriyethalpartisi #chpli #altıok #siyaset #haber #gündem #türkiye"
-        if caption:
-            caption = caption + hashtags
-        else:
-            caption = hashtags.strip()
-        
-        print(f"📤 Paylaşılıyor: {filename}")
-        print(f"📝 Caption: {caption[:100] if caption else 'Boş'}...")
-        
-        # Fotoğrafı tam boyutta paylaş (resize yapma)
-        media = instagram_client.photo_upload(
-            filename, 
-            caption,
-            extra_data={"disable_comments": False}
-        )
-        
-        print(f"✅ Paylaşıldı! Media ID: {media.pk}")
-        
-        return jsonify({
-            'success': True, 
-            'message': 'Instagram\'a paylaşıldı!',
-            'media_id': str(media.pk)
-        })
-    except Exception as e:
-        error_msg = str(e)
-        print(f"❌ Instagram paylaşım hatası: {error_msg}")
-        return jsonify({'success': False, 'error': error_msg})
-
+# --- WEBSOCKET OLAYLARI ---
 @app.route('/api/instagram/logout', methods=['POST'])
 def instagram_logout():
     """Instagram oturumunu kapat"""
