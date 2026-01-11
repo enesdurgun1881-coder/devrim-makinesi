@@ -332,37 +332,44 @@ def instagram_login():
         session_file = 'instagram_session.json'
         try:
             if os.path.exists(session_file):
-                print("📂 Session dosyası bulundu, yükleniyor...")
+                websocket_log("📂 Session dosyası bulundu, yükleniyor...", "info")
                 instagram_client.load_settings(session_file)
                 
                 # Session geçerli mi kontrol et (Login yapmadan)
                 try:
                     # Basit bir istek atarak session'ı test et
                     instagram_client.get_timeline_feed()
-                    print("✅ Session geçerli! Şifreli giriş atlanıyor.")
+                    websocket_log("✅ Session geçerli! Şifreli giriş atlanıyor.", "success")
                     
                     # CSRF token kontrolü ve yenileme
                     try:
                         csrf = instagram_client.cookie_dict.get('csrftoken')
                         if csrf:
                             instagram_client.headers.update({'X-CSRFToken': csrf})
-                            print(f"🔧 CSRF Token güncellendi: {csrf[:5]}...")
+                            # websocket_log(f"🔧 CSRF Token güncellendi: {csrf[:5]}...", "info")
                     except:
                         pass
+                    
+                    # Başarılı dönüş ve durum güncelleme
+                    global instagram_logged_in, instagram_username
+                    instagram_logged_in = True
+                    instagram_username = username
+                    
+                    return jsonify({'success': True, 'message': f'@{username} hesabına session ile giriş yapıldı!'})
                         
                 except Exception as e:
-                    print(f"⚠️ Session geçersiz veya süresi dolmuş: {e}")
-                    print("🔄 Normal giriş deneniyor...")
+                    websocket_log(f"⚠️ Session geçersiz: {str(e)[:50]}", "warning")
+                    websocket_log("🔄 Normal giriş deneniyor...", "info")
                     instagram_client.login(username, password)
             else:
+                websocket_log("🔐 Yeni giriş yapılıyor...", "info")
                 instagram_client.login(username, password)
-                print("✅ Yeni giriş yapıldı")
+                websocket_log("✅ Giriş başarılı!", "success")
             
             # Session'ı kaydet
             instagram_client.dump_settings(session_file)
             
             # Global durumu güncelle
-            global instagram_logged_in, instagram_username
             instagram_logged_in = True
             instagram_username = username
             
@@ -370,17 +377,20 @@ def instagram_login():
             
         except TwoFactorRequired:
             instagram_client = None
+            websocket_log("⚠️ Instagram 2FA kodu istiyor!", "error")
             return jsonify({'success': False, 'error': '2FA aktif! Instagram ayarlarından iki adımlı doğrulamayı geçici olarak kapatın.'})
         except ChallengeRequired:
             instagram_client = None
-            return jsonify({'success': False, 'error': 'Instagram doğrulama istiyor. Instagram uygulamasından hesabınıza giriş yapın ve tekrar deneyin.'})
+            websocket_log("⚠️ Instagram doğrulama (Challenge) istiyor!", "error")
+            return jsonify({'success': False, 'error': 'Instagram doğrulama istiyor. Uygulamadan giriş yapın.'})
         except LoginRequired:
             instagram_client = None
-            return jsonify({'success': False, 'error': 'Giriş başarısız. Kullanıcı adı veya şifre yanlış olabilir.'})
+            websocket_log("❌ Giriş başarısız: Kullanıcı adı/şifre yanlış.", "error")
+            return jsonify({'success': False, 'error': 'Giriş başarısız. Bilgileri kontrol edin.'})
             
     except Exception as e:
         error_msg = str(e)
-        print(f"❌ Instagram hatası: {error_msg}")
+        websocket_log(f"❌ Instagram hatası: {error_msg[:100]}", "error")
         instagram_client = None
         return jsonify({'success': False, 'error': f'Hata: {error_msg}'})
 
