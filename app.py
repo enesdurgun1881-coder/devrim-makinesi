@@ -332,9 +332,28 @@ def instagram_login():
         session_file = 'instagram_session.json'
         try:
             if os.path.exists(session_file):
+                print("📂 Session dosyası bulundu, yükleniyor...")
                 instagram_client.load_settings(session_file)
-                instagram_client.login(username, password)
-                print("✅ Session ile giriş yapıldı")
+                
+                # Session geçerli mi kontrol et (Login yapmadan)
+                try:
+                    # Basit bir istek atarak session'ı test et
+                    instagram_client.get_timeline_feed()
+                    print("✅ Session geçerli! Şifreli giriş atlanıyor.")
+                    
+                    # CSRF token kontrolü ve yenileme
+                    try:
+                        csrf = instagram_client.cookie_dict.get('csrftoken')
+                        if csrf:
+                            instagram_client.headers.update({'X-CSRFToken': csrf})
+                            print(f"🔧 CSRF Token güncellendi: {csrf[:5]}...")
+                    except:
+                        pass
+                        
+                except Exception as e:
+                    print(f"⚠️ Session geçersiz veya süresi dolmuş: {e}")
+                    print("🔄 Normal giriş deneniyor...")
+                    instagram_client.login(username, password)
             else:
                 instagram_client.login(username, password)
                 print("✅ Yeni giriş yapıldı")
